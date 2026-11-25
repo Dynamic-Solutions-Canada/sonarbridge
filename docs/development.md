@@ -216,7 +216,7 @@ SonarBridge is distributed only through Google Play, which delivers its updates;
 4. Check the draft in Play Console, then run **Publish to Google Play** with the tag and `publish_draft=true`. It sends that draft to review after checking its versionCode against the tag, without uploading anything.
 5. Afterwards, run Play Check and confirm an installed copy updates from Play.
 
-`PLAY_SIGNING_CERTIFICATE_SHA256` (repository variable) is the **app-signing** SHA-256 fingerprint from Play Console, not the upload key; the APK export fails closed if it is missing or differs from Google's metadata or the APK's signer. Release signing credentials stay in GitHub secrets and the git-ignored `android/keystore/release.env`.
+`PLAY_SIGNING_CERTIFICATE_SHA256` (repository variable) is the **app-signing** SHA-256 fingerprint from Play Console, not the upload key; the APK export fails closed if it is missing or differs from Google's metadata or the APK's signer. Release signing credentials stay in GitHub secrets and `~/.secrets/sonarbridge/play-upload/release.env`, outside the repository.
 
 If the APK export failed, or its artifact has expired, run **Export Play APK** by hand with the tag. It never builds or uploads anything.
 
@@ -246,9 +246,9 @@ npm run package:android
 | Key | Lives in | Signs |
 | --- | --- | --- |
 | App signing (Google's) | Google, not exportable | What users install from Play |
-| Upload (yours) | `android/keystore/release.keystore` (git-ignored) and the write-only `ANDROID_KEYSTORE_BASE64` secret | Bundles sent to Play; also the final legacy APK, v0.2.4 |
+| Upload (yours) | `~/.secrets/sonarbridge/play-upload/release.keystore`, outside the repository (backed up to the Windows profile's `.secrets`) and the write-only `ANDROID_KEYSTORE_BASE64` secret | Bundles sent to Play; also the final legacy APK, v0.2.4 |
 
-The upload key's alias is `sonarbridge` and its SHA-256 fingerprint is `D9:BE:CA:DD:57:3C:DE:44:24:C7:CC:92:A0:88:F7:A7:4F:EC:23:17:61:D3:14:D1:ED:A2:60:1C:C4:BE:F3:C9`. Keep a durable backup of `release.keystore` and `release.env`: the GitHub secret cannot be read back, and losing both means an upload-key reset request to Play support. Never use the upload-key fingerprint for `PLAY_SIGNING_CERTIFICATE_SHA256`; set that from the app-signing certificate in Play Console, or read it from an existing bundle with the Play Check workflow. Do not derive it from the APK being downloaded.
+The upload key's alias is `sonarbridge` and its SHA-256 fingerprint is `D9:BE:CA:DD:57:3C:DE:44:24:C7:CC:92:A0:88:F7:A7:4F:EC:23:17:61:D3:14:D1:ED:A2:60:1C:C4:BE:F3:C9`. Both files are backed up in the Windows profile's `.secrets\sonarbridge\play-upload`: the GitHub secret cannot be read back, and losing both means an upload-key reset request to Play support. Never use the upload-key fingerprint for `PLAY_SIGNING_CERTIFICATE_SHA256`; set that from the app-signing certificate in Play Console, or read it from an existing bundle with the Play Check workflow. Do not derive it from the APK being downloaded.
 
 **Distribution decision (2026-11-18):** SonarBridge is distributed only through Google Play. GitHub Releases carry no APK, and the app has no `github`/`play` flavours. Until then GitHub carried Google's signed universal APK, which kept one signer across both channels.
 

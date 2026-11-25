@@ -32,7 +32,7 @@ android {
 
     // Debug pinned so containerized builds don't regenerate a fresh keystore
     // each run (breaks `adb install -r`); release key comes from env/CI
-    // secrets (android/keystore/release.keystore locally, gitignored).
+    // secrets (~/.secrets/sonarbridge/play-upload/release.keystore locally, outside the repository).
     signingConfigs {
         getByName("debug") {
             storeFile = file("../keystore/debug.keystore")
